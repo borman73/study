@@ -5,10 +5,12 @@ module Exercise
       # Использовать свои написанные функции для реализации следующих - можно.
 
       # Написать свою функцию my_each
-      def my_each
-        for item in self
-          yield(item)
-        end
+      def my_each (&func)
+        first, *rest = self
+        return if rest.empty?
+
+        func.call(first)
+        MyArray.new(rest).my_each(&func)
         self
       end
 
@@ -27,17 +29,16 @@ module Exercise
       end
 
       # Написать свою функцию my_reduce
-      def my_reduce(acc = nil)
-        head, *tail = self
-
-        new_array = acc.nil? ? tail : self
-        acc = acc.nil? ? head : acc
-
-        for item in new_array
-          acc = yield(acc, item)
+      def my_reduce(acc = nil, &func)
+        first, *rest = self
+        if acc.nil?
+          acc = first
+          first, *rest = rest
         end
+        acc = func.call(acc, first)
+        return acc if rest.empty? 
 
-        acc
+        MyArray.new(rest).my_reduce(acc, &func)
       end
     end
   end
